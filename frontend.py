@@ -5,6 +5,12 @@ from backend import *
 gui = Tk()
 gui.geometry("800x500")
 gui.title("Sibyl")
+cities = {
+    "ottawa": "45.4215, -75.6972",
+    "toronto": "43.6532, -79.3832"
+
+}
+
 
 def getWeather(param,name,where,extension):
     makeImage(param,name,where,extension)

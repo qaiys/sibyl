@@ -40,9 +40,9 @@ def makeImage(listoDays, name, where, extension):
     for i in range(0,4):
         img = pygame.image.load('assets/'+str(listoDays[i][1])+'.png')
         temperature = myfont.render(str(listoDays[i][0]), True, (0, 0, 0))
-        screen.blit(img,(0,why))
-        screen.blit(temperature,(100,why))
-        why += 100
+        screen.blit(img,(why,256))
+        screen.blit(temperature,(why,386))
+        why += 128
     pygame.display.flip()
     pygame.image.save(screen, where+"/"+name+extension)
     exit()
