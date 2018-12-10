@@ -8,7 +8,6 @@ gui.title("Sibyl")
 cities = {
     "ottawa": "45.4215, -75.6972",
     "toronto": "43.6532, -79.3832"
-
 }
 
 
@@ -22,7 +21,7 @@ a = Label(gui ,text="City:").grid(row=0,column = 0)
 weather = Label(gui,text='-')
 weather.grid(row=6,column=1)
 
-param = Entry(gui)
+param = Entry(gui) 
 param.grid(row=1,column=0)
 
 name = Entry(gui)

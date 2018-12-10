@@ -24,13 +24,13 @@ def makeCurrent():
     listoDays = []
     for i in range(0,4):
         temp = [days[i].tellTemp(),days[i].tellSum()]
-        listoDays.append(temp )
+        listoDays.append(temp)
     return listoDays
 
 def makeImage(listoDays, name, where, extension):
     white = (255, 255, 255)
-    w = 500
-    h = 500
+    w = 1028
+    h = 720
     screen = pygame.display.set_mode((w, h))
     screen.fill((white))
     running = 1
@@ -42,7 +42,7 @@ def makeImage(listoDays, name, where, extension):
         temperature = myfont.render(str(listoDays[i][0]), True, (0, 0, 0))
         screen.blit(img,(why,256))
         screen.blit(temperature,(why,386))
-        why += 128
+        why += 258
     pygame.display.flip()
     pygame.image.save(screen, where+"/"+name+extension)
     exit()
