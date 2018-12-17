@@ -1,6 +1,7 @@
 import requests
 import pygame
 from terminaltables import AsciiTable
+from geopy.geocoders import Nominatim
 pygame.init()
 class Day:
     def __init__(self,temp,sum):
@@ -15,9 +16,28 @@ def FtoC(F):
     C = (int(F)-32) * (5/9)
     return str(int(C)) + "°C"
 
-def makeCurrent():
+def makeCoords(city):
+    geolocator = Nominatim(user_agent="Sibyl")
+    location = geolocator.geocode(city)
+    coords = str((location.latitude,location.longitude))
+    coords = coords.split(', ')
+    lat = coords[0]
+    long = coords[1]
+    lat=lat.replace('(','')
+    long=long.replace(')','')
+    lat = lat.split('.')
+    long = long.split('.')
+    longi = long[1]
+    longi = str(long[0])+'.'+str((longi[0:4]))
+    latind = lat[1]
+    lati = str(lat[0])+'.'+str((latind[0:4]))
+    coords = lati +', '+longi
+    return coords
+
+def makeCurrent(city):
     key = '114a036fbe8618ec0e3c7b7694391c35'
-    api_adress = 'https://api.darksky.net/forecast/'+ key +'/45.4215, -75.6972'
+    coords = makeCoords(city)
+    api_adress = 'https://api.darksky.net/forecast/'+ key +'/'+ coords
     url = api_adress
     json_data = requests.get(url).json()
     days = [Day((json_data['hourly']['data'][i*12]['temperature']),(json_data['hourly']['data'][i*12]['icon'])) for i in range(0,4)]
@@ -29,7 +49,7 @@ def makeCurrent():
 
 def makeImage(listoDays, name, where, extension):
     white = (255, 255, 255)
-    w = 1028
+    w = 512
     h = 720
     screen = pygame.display.set_mode((w, h))
     screen.fill((white))
@@ -42,7 +62,7 @@ def makeImage(listoDays, name, where, extension):
         temperature = myfont.render(str(listoDays[i][0]), True, (0, 0, 0))
         screen.blit(img,(why,256))
         screen.blit(temperature,(why,386))
-        why += 258
+        why += 128
     pygame.display.flip()
     pygame.image.save(screen, where+"/"+name+extension)
     exit()
