@@ -36,8 +36,14 @@ def makeCoords(city):
 
 def makeCurrent(city):
     key = '114a036fbe8618ec0e3c7b7694391c35'
-    coords = makeCoords(city)
+    while True:
+        try:
+            coords = makeCoords(city)
+            break
+        except:
+            pass
     api_adress = 'https://api.darksky.net/forecast/'+ key +'/'+ coords
+    print(coords)
     url = api_adress
     json_data = requests.get(url).json()
     days = [Day((json_data['hourly']['data'][i*12]['temperature']),(json_data['hourly']['data'][i*12]['icon'])) for i in range(0,4)]
@@ -57,10 +63,12 @@ def makeImage(listoDays, name, where, extension):
     screen.fill((white))
     myfont = pygame.font.SysFont('Arial', 30)
     why = 0
+    name = myfont.render('ottawa',True,(0,0,0))
     for i in range(0,4):
         img = pygame.image.load('assets/'+str(listoDays[i][1])+'.png')
         temperature = myfont.render(str(listoDays[i][0]), True, (0, 0, 0))
         screen.blit(img,(why,256))
+        screen.blit(name,(0,0))
         screen.blit(temperature,(why,386))
         why += 128
     pygame.display.flip()
