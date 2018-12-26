@@ -1,14 +1,15 @@
 #!/usr/bin/python
 from tkinter import *
 from tkinter import ttk
+from tkinter import filedialog
 from backend import *
 
 gui = Tk()
 gui.geometry("800x500")
 gui.title("Sibyl")
 
-def getWeather(param,name,where,extension):
-    makeImage(param,name,where,extension)
+def getWeather(param,name,where,extension,city):
+    makeImage(param,name,where,extension,city)
 
 def main():
     a = Label(gui ,text="City:").grid(row=0,column = 0)
@@ -31,8 +32,7 @@ def main():
     extension = ttk.Combobox(gui,textvariable=extVar)
     extension['values']=(".png",".jpeg",".tiff")
     extension.grid(row=1,column=3)
-
-    getter = Button(gui, text="Get Weather",command=lambda : getWeather(makeCurrent(param.get()),name.get(),where.get(),extension.get()).grid(row=5,column=0))
+    getter = Button(gui, text="Get Weather",command=lambda : getWeather(makeCurrent(param.get()),name.get(),where.get(),extension.get(),param.get()).grid(row=5,column=0))
     getter.grid(row=5,column=0)
 
 main()
