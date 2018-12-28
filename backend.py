@@ -65,12 +65,12 @@ def makeImage(listoDays, name, where, extension, city): #puts assets on a pygame
     myfont = pygame.font.SysFont('Arial', 30)
     why = 64
     city = (city[0]).capitalize() + (city[1:(len(city))])
-    oogabooga = myfont.render(city,True,(0,0,0))
+    theCity = myfont.render(city,True,(0,0,0))
     for i in range(0,4):
         img = pygame.image.load('assets/'+str(listoDays[i][1])+'.png')
         temperature = myfont.render(str(listoDays[i][0]), True, (0, 0, 0))
         screen.blit(img,(why,256))
-        screen.blit(oogabooga,(0,100))
+        screen.blit(theCity,(0,100))
         screen.blit(temperature,(why,386))
         why += 320
     pygame.display.flip()
