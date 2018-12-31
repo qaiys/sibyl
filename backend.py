@@ -3,6 +3,7 @@ import pygame
 from terminaltables import AsciiTable
 from geopy.geocoders import Nominatim
 import datetime
+import os
 pygame.init()
 class Day:
     def __init__(self,temp,sum):
@@ -54,33 +55,33 @@ def makeCurrent(city): #gets weather information and returns a list
         listoDays.append(temp)
     return listoDays
 
-def makeImage(listoDays, name, where, extension, city): #puts assets on a pygame surface and takes a screenshot.
+def makeImage(listoDays, where, cityName, backgroundLocation): #puts assets on a pygame surface and takes a screenshot.
     white = (255, 255, 255)
     w = 1280
     h = 720
+    #bgLocation = filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("png files","*.png"),("all files","*.*")))
+    bg = pygame.image.load(backgroundLocation)
     screen = pygame.display.set_mode((w, h))
     screen.fill((white))
     running = 1
     screen.fill((white))
     myfont = pygame.font.SysFont('Arial', 30)
+    titalFont = pygame.font.SysFont('Arial', 120)
     why = 64
-    city = (city[0]).capitalize() + (city[1:(len(city))])
-    theCity = myfont.render(city,True,(0,0,0))
+    titalOfCity = (cityName[0]).capitalize() + (cityName[1:(len(cityName))])
+    theCity = titalFont.render(titalOfCity,True,(0,0,0))
+    screen.blit(bg,(0,0))
     for i in range(0,4):
         img = pygame.image.load('assets/'+str(listoDays[i][1])+'.png')
         temperature = myfont.render(str(listoDays[i][0]), True, (0, 0, 0))
+        pygame.draw.rect(screen, (0,0,0),((why-3),253,134,134))
         screen.blit(img,(why,256))
-        screen.blit(theCity,(0,100))
+        screen.blit(theCity,(0,0))
         screen.blit(temperature,(why,386))
         why += 320
     pygame.display.flip()
-    if where == '':
-        where = 'pictures'
-    if name == '':
-        now = datetime.datetime.now()
-        name = now.strftime("%Y-%m-%d")
-    saveHere = (str(where)+"/"+str(name)+str(extension))
+    saveHere = (str(where))
     print(saveHere)
-    pygame.image.save(screen, saveHere)
-
+    pygame.image.save(screen, "temp.png")
+    os.rename("temp.png", str(saveHere)+".png")
     exit()
