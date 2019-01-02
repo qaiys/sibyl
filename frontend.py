@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
@@ -18,7 +18,6 @@ def getWeather(param, cityName, backgroundLocation):
     makeImage(param,where,cityName, backgroundLocation)
 def changeBackground(obj):
     newBgLocation = filedialog.askopenfilename(initialdir = str(os.getcwd),title = "Select file",filetypes = (("png files","*.png"),("all files","*.*")))
-    #obj.selection_from(END)
     obj.delete(0,END)
     obj.insert(END, newBgLocation)
     return newBgLocation

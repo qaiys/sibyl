@@ -48,6 +48,7 @@ def makeCurrent(city): #gets weather information and returns a list
     #print(coords)
     url = api_adress
     json_data = requests.get(url).json()
+#    print(json_data)
     days = [Day((json_data['hourly']['data'][i*12]['temperature']),(json_data['hourly']['data'][i*12]['icon'])) for i in range(0,4)]
     listoDays = []
     for i in range(0,4):
@@ -81,7 +82,6 @@ def makeImage(listoDays, where, cityName, backgroundLocation): #puts assets on a
         why += 320
     pygame.display.flip()
     saveHere = (str(where))
-    print(saveHere)
     pygame.image.save(screen, "temp.png")
     os.rename("temp.png", str(saveHere)+".png")
     exit()
