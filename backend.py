@@ -24,6 +24,9 @@ def FtoC(F):
     C = (int(F)-32) * (5/9)
     return str(int(C)) + "°C"
 
+def getFonts():
+    return pygame.font.get_fonts()
+    
 def makeCoords(city): #takes coords from geopy and makes them readable by darksky. Not really well typed but it just werks
     geolocator = Nominatim(user_agent="Sibyl")
     location = geolocator.geocode(city)
@@ -54,7 +57,7 @@ def precipChanceGetter(list,n):
         return ''
 
 def centralizor(widthOfIcon, widthOfText):
-    return ((widthOfIcon + (widthOfText/2)) / 4)
+    return ((widthOfIcon - (widthOfText)) / 2)
 
 def makeCurrent(city): #gets weather information and returns a list
     key = '114a036fbe8618ec0e3c7b7694391c35'
@@ -97,20 +100,25 @@ def makeImage(listoDays, where, cityName, backgroundLocation): #puts assets on a
     titalOfCity = titalize(cityName)
     theCity = titalFont.render(titalOfCity,True,(0,0,0))
     screen.blit(bg,(0,0))
+    times = ["Now","Later","Tomorrow","Afternoon"]
     for i in range(0,4):
         img = pygame.image.load('assets/'+str(listoDays[i][1])+'.png')
         temperature = myfont.render(str(listoDays[i][0]), True, (0, 0, 0))
+        theTime = myfont.render(str(times[i]), True, (0, 0, 0))
         txtMoveby = centralizor(img.get_width(),temperature.get_width())
+        screen.blit(temperature,(why + txtMoveby,386))
+        timeMoveby = centralizor(img.get_width(),theTime.get_width())
         typeOfPrecip = myfont.render(str(listoDays[i][2]), True, (0, 0, 0))
         if str(listoDays[i][3]) != '0':
-            placeholder = str(listoDays[i][3]) + "%" + " chance of"
+            placeholder = str(listoDays[i][3]) + "%" + " chance of " + str(listoDays[i][2])
             precipChance = myfont.render(str(placeholder), True, (0, 0, 0))
-            screen.blit(precipChance,(why,420))
+            txtMoveby = centralizor(img.get_width(),precipChance.get_width())
+            screen.blit(precipChance,(why + txtMoveby,420))
         pygame.draw.rect(screen, (0,0,0),((why-3),253,134,134))
         screen.blit(img,(why,256))
         screen.blit(theCity,(0,0))
-        screen.blit(temperature,(why + txtMoveby,386))
-        screen.blit(typeOfPrecip,(why,456))
+        screen.blit(theTime,(why + timeMoveby,195))
+        #screen.blit(typeOfPrecip,(why,456))
         why += 320
     pygame.display.flip()
     saveHere = (str(where))
