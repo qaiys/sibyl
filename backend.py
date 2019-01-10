@@ -4,6 +4,7 @@ from terminaltables import AsciiTable
 from geopy.geocoders import Nominatim
 import datetime
 import os
+
 pygame.init()
 class Day:
     def __init__(self,temp,sum,pt,ptper):
@@ -26,7 +27,7 @@ def FtoC(F):
 
 def getFonts():
     return pygame.font.get_fonts()
-    
+
 def makeCoords(city): #takes coords from geopy and makes them readable by darksky. Not really well typed but it just werks
     geolocator = Nominatim(user_agent="Sibyl")
     location = geolocator.geocode(city)
@@ -45,7 +46,7 @@ def makeCoords(city): #takes coords from geopy and makes them readable by darksk
     coords = lati +', '+longi
     return coords
 
-def precipGetter(list,n):
+def precipGetter(list,n): #since not all of the json list parts have precip, this is just to stop any errors from happenening when the days objects is made
     try:
         return list['hourly']['data'][n*12]['precipType']
     except:
@@ -76,11 +77,11 @@ def makeCurrent(city): #gets weather information and returns a list
                 (precipChanceGetter(json_data,i)))
                 for i in range(0,4)]
     listoDays = []
-    #print(json_data)
     for i in range(0,4):
         temp = [days[i].tellTemp(),days[i].tellSum(),days[i].tellPt(),days[i].tellPtper()]
         listoDays.append(temp)
     return listoDays
+
 def titalize(word):
     capped_word = (word[0]).capitalize() + (word[1:(len(word))])
     return capped_word
@@ -91,11 +92,12 @@ def makeImage(listoDays, where, cityName, backgroundLocation): #puts assets on a
     h = 720
     bg = pygame.image.load(backgroundLocation)
     screen = pygame.display.set_mode((w, h))
+    logo = pygame.image.load("assets/logo.png")
     screen.fill((white))
-    running = 1
     screen.fill((white))
     myfont = pygame.font.SysFont('Arial', 30)
-    titalFont = pygame.font.SysFont('Arial', 120)
+    titalFont = pygame.font.SysFont('Arial', 110)
+    smolFont = pygame.font.SysFont('Arial', 20)
     why = 64
     titalOfCity = titalize(cityName)
     theCity = titalFont.render(titalOfCity,True,(0,0,0))
@@ -111,13 +113,16 @@ def makeImage(listoDays, where, cityName, backgroundLocation): #puts assets on a
         typeOfPrecip = myfont.render(str(listoDays[i][2]), True, (0, 0, 0))
         if str(listoDays[i][3]) != '0':
             placeholder = str(listoDays[i][3]) + "%" + " chance of " + str(listoDays[i][2])
-            precipChance = myfont.render(str(placeholder), True, (0, 0, 0))
+            precipChance = smolFont.render(str(placeholder), True, (0, 0, 0))
             txtMoveby = centralizor(img.get_width(),precipChance.get_width())
             screen.blit(precipChance,(why + txtMoveby,420))
         pygame.draw.rect(screen, (0,0,0),((why-3),253,134,134))
+        pygame.draw.rect(screen, (255,255,255),[(why + timeMoveby-2),195-2,(theTime.get_width()+4),(theTime.get_height()+4)])
+        pygame.draw.rect(screen, (0,0,0),[(why + timeMoveby-2),195-2,(theTime.get_width()+4),(theTime.get_height()+4)],2)
         screen.blit(img,(why,256))
-        screen.blit(theCity,(0,0))
+        screen.blit(theCity,(15 ,0))
         screen.blit(theTime,(why + timeMoveby,195))
+        screen.blit(logo,(1190,10))
         #screen.blit(typeOfPrecip,(why,456))
         why += 320
     pygame.display.flip()
