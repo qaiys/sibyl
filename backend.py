@@ -1,6 +1,6 @@
 import requests
 import pygame
-from terminaltables import AsciiTable
+#from terminaltables import AsciiTable
 from geopy.geocoders import Nominatim
 import datetime
 import os
@@ -62,6 +62,7 @@ def centralizor(widthOfIcon, widthOfText):
 
 def makeCurrent(city): #gets weather information and returns a list
     key = '114a036fbe8618ec0e3c7b7694391c35'
+    #114a036fbe8618ec0e3c7b7694391c35
     while True:
         try:
             coords = makeCoords(city)
@@ -70,7 +71,10 @@ def makeCurrent(city): #gets weather information and returns a list
             pass
     api_adress = 'https://api.darksky.net/forecast/'+ key +'/'+ coords
     url = api_adress
-    json_data = requests.get(url).json()
+    try:
+        json_data = requests.get(url).json()
+    except:
+        return 3
     days = [Day((json_data['hourly']['data'][i*12]['temperature']),
                 (json_data['hourly']['data'][i*12]['icon']),
                 (precipGetter(json_data,i)),
@@ -88,45 +92,54 @@ def titalize(word):
 
 def makeImage(listoDays, where, cityName, backgroundLocation): #puts assets on a pygame surface and takes a screenshot.
     white = (255, 255, 255)
+    black = (0,0,0)
     w = 1280
     h = 720
     bg = pygame.image.load(backgroundLocation)
+    #bg = pygame.draw.rect(screen,(0,255,0),(0,0,1280,720))
     screen = pygame.display.set_mode((w, h))
     logo = pygame.image.load("assets/logo.png")
-    screen.fill((white))
-    screen.fill((white))
+    #screen.fill((0,255,0))
+    #screen.fill((white))
     myfont = pygame.font.SysFont('Arial', 30)
     titalFont = pygame.font.SysFont('Arial', 110)
     smolFont = pygame.font.SysFont('Arial', 20)
     why = 64
     titalOfCity = titalize(cityName)
-    theCity = titalFont.render(titalOfCity,True,(0,0,0))
+    theCity = titalFont.render(titalOfCity,True,(black))
     screen.blit(bg,(0,0))
     times = ["Now","Later","Tomorrow","Afternoon"]
     for i in range(0,4):
         img = pygame.image.load('assets/'+str(listoDays[i][1])+'.png')
-        temperature = myfont.render(str(listoDays[i][0]), True, (0, 0, 0))
-        theTime = myfont.render(str(times[i]), True, (0, 0, 0))
+        temperature = myfont.render(str(listoDays[i][0]), True, (black))
+        theTime = myfont.render(str(times[i]), True, (black))
         txtMoveby = centralizor(img.get_width(),temperature.get_width())
         screen.blit(temperature,(why + txtMoveby,386))
         timeMoveby = centralizor(img.get_width(),theTime.get_width())
-        typeOfPrecip = myfont.render(str(listoDays[i][2]), True, (0, 0, 0))
+        typeOfPrecip = myfont.render(str(listoDays[i][2]), True, (black))
         if str(listoDays[i][3]) != '0':
             placeholder = str(listoDays[i][3]) + "%" + " chance of " + str(listoDays[i][2])
-            precipChance = smolFont.render(str(placeholder), True, (0, 0, 0))
+            precipChance = smolFont.render(str(placeholder), True, (black))
             txtMoveby = centralizor(img.get_width(),precipChance.get_width())
-            screen.blit(precipChance,(why + txtMoveby,420))
-        pygame.draw.rect(screen, (0,0,0),((why-3),253,134,134))
-        pygame.draw.rect(screen, (255,255,255),[(why + timeMoveby-2),195-2,(theTime.get_width()+4),(theTime.get_height()+4)])
-        pygame.draw.rect(screen, (0,0,0),[(why + timeMoveby-2),195-2,(theTime.get_width()+4),(theTime.get_height()+4)],2)
-        screen.blit(img,(why,256))
+            screen.blit(precipChance,(why + txtMoveby,420 + 40))
+        pygame.draw.rect(screen, (black),((why-3),253 + 40,134,134))
+        pygame.draw.rect(screen, (255,255,255),[(why + timeMoveby-2),195-2 + 40,(theTime.get_width()+4),(theTime.get_height()+4)])
+        pygame.draw.rect(screen, (black),[(why + timeMoveby-2),195-2 + 40,(theTime.get_width()+4),(theTime.get_height()+4)],2)
+        screen.blit(img,(why,296))
         screen.blit(theCity,(15 ,0))
-        screen.blit(theTime,(why + timeMoveby,195))
+        screen.blit(theTime,(why + timeMoveby,195 + 40))
         screen.blit(logo,(1190,10))
-        #screen.blit(typeOfPrecip,(why,456))
         why += 320
     pygame.display.flip()
     saveHere = (str(where))
     pygame.image.save(screen, "temp.png")
-    os.rename("temp.png", str(saveHere)+".png")
-    exit()
+
+    try:
+        pygame.display.quit()
+        os.rename("temp.png", str(saveHere)+".png")
+        return 1 #I stole this idea from C programming. All functions have a return 1 or 0 built in and I didn't know how to prompt for overwriting with tkinter so when life gives you errors I guess.
+        exit()
+    except FileExistsError:
+        pygame.display.quit()
+        return 0
+        exit()
