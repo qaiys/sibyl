@@ -103,7 +103,7 @@ def makeImage(listoDays, where, cityName, backgroundLocation): #puts assets on a
     #screen.fill((white))
     myfont = pygame.font.SysFont('Arial', 30)
     titalFont = pygame.font.SysFont('Arial', 110)
-    smolFont = pygame.font.SysFont('Arial', 20)
+    smolFont = pygame.font.SysFont('Arial', 25)
     why = 64
     titalOfCity = titalize(cityName)
     theCity = titalFont.render(titalOfCity,True,(black))
@@ -114,19 +114,19 @@ def makeImage(listoDays, where, cityName, backgroundLocation): #puts assets on a
         temperature = myfont.render(str(listoDays[i][0]), True, (black))
         theTime = myfont.render(str(times[i]), True, (black))
         txtMoveby = centralizor(img.get_width(),temperature.get_width())
-        screen.blit(temperature,(why + txtMoveby,386))
         timeMoveby = centralizor(img.get_width(),theTime.get_width())
         typeOfPrecip = myfont.render(str(listoDays[i][2]), True, (black))
         if str(listoDays[i][3]) != '0':
             placeholder = str(listoDays[i][3]) + "%" + " chance of " + str(listoDays[i][2])
             precipChance = smolFont.render(str(placeholder), True, (black))
-            txtMoveby = centralizor(img.get_width(),precipChance.get_width())
-            screen.blit(precipChance,(why + txtMoveby,420 + 40))
+            precipMoveby = centralizor(img.get_width(),precipChance.get_width())
+            screen.blit(precipChance,(why + precipMoveby,420 + 40))
         pygame.draw.rect(screen, (black),((why-3),253 + 40,134,134))
         pygame.draw.rect(screen, (255,255,255),[(why + timeMoveby-2),195-2 + 40,(theTime.get_width()+4),(theTime.get_height()+4)])
         pygame.draw.rect(screen, (black),[(why + timeMoveby-2),195-2 + 40,(theTime.get_width()+4),(theTime.get_height()+4)],2)
+        screen.blit(temperature,(why + txtMoveby,426))
         screen.blit(img,(why,296))
-        screen.blit(theCity,(15 ,0))
+        screen.blit(theCity,(25 ,0))
         screen.blit(theTime,(why + timeMoveby,195 + 40))
         screen.blit(logo,(1190,10))
         why += 320
@@ -137,9 +137,11 @@ def makeImage(listoDays, where, cityName, backgroundLocation): #puts assets on a
     try:
         pygame.display.quit()
         os.rename("temp.png", str(saveHere)+".png")
+        os.remove(".png")
         return 1 #I stole this idea from C programming. All functions have a return 1 or 0 built in and I didn't know how to prompt for overwriting with tkinter so when life gives you errors I guess.
         exit()
     except FileExistsError:
         pygame.display.quit()
+        os.remove("temp.png")
         return 0
         exit()

@@ -14,12 +14,12 @@ def getWeather(param, cityName, backgroundLocation, error_log):
     error_log = error_log
     now = datetime.datetime.now()
     name = now.strftime("%Y-%m-%d")
-    where = filedialog.asksaveasfilename(initialdir = str(os.getcwd),title = "Select file",initialfile = (name),filetypes = (("png files","*.png"),("jpg files","*.jpg"),("all files","*.*")))
+    where = filedialog.asksaveasfilename(initialdir = str(os.getcwd),title = "Select file",initialfile = (name),filetypes = (("png files","*.png"),("all files","*.*")))
     print(where)
     error_catcher = makeImage(param,where,cityName, backgroundLocation)
     changeErrorLog(error_catcher,error_log)
 def changeBackground(obj):
-    newBgLocation = filedialog.askopenfilename(initialdir = str(os.getcwd),title = "Select file",filetypes = (("png files","*.png"),("all files","*.*")))
+    newBgLocation = filedialog.askopenfilename(initialdir = str(os.getcwd),title = "Select file",filetypes = (("png files","*.png"),("jpg files","*.jpg"),("all files","*.*")))
     obj.delete(0,END)
     obj.insert(END, newBgLocation)
     return newBgLocation
