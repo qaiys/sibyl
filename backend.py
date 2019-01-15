@@ -1,6 +1,5 @@
 import requests
 import pygame
-#from terminaltables import AsciiTable
 from geopy.geocoders import Nominatim
 import datetime
 import os
