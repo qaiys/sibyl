@@ -27,7 +27,7 @@ def changeBackground(obj):
     obj.insert(END, newBgLocation)
     return newBgLocation
 
-def changeErrorLog(error_number, obj):
+def changeErrorLog(error_number, obj): #all the possible errors (that we know of!) from the backend part.
     errors = {
         1: "Successfully saved file!",
         0: "Error: That file already exists\nRename it or delete the existing file",
@@ -38,13 +38,15 @@ def changeErrorLog(error_number, obj):
     obj['text'] = errors.get(int(error_number))
 
 def main():
+
     a = Label(gui ,text="City:").grid(row=0,column=0)
     b = Label(gui ,text="Background:").grid(row=3,column=0)
-    #c = Label(gui ,text="Font:").grid(row=6,column=0)
+
     labelframe = LabelFrame(gui, text="Error Log:",width=100)
     labelframe.grid(row=8,column=0)
     e = Label(labelframe, text="", anchor='w')
     e.pack()
+
     param = Entry(gui)
     param.grid(row=1,column=0,)
 
@@ -52,11 +54,9 @@ def main():
     name.insert(END,"assets/greenscreen.png")
     name.grid(row=4,column=0)
 
-    ##fontbox = ttk.Combobox(values = getFonts())
-    #fontbox.grid(row=7,column=0 )
-    #fontbox.set("Arial")
     change = Button(gui, text="Change Background", command=lambda : changeBackground(name))
     change.grid(row=5,column=0,pady=(0,10))
+
     getter = Button(gui, text="Get Weather",command=lambda : getWeather(makeCurrent(param.get()),param.get(),name.get(),e))
     getter.grid(row=2,column=0,pady=(0,10))
 

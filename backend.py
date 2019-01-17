@@ -31,19 +31,12 @@ def makeCoords(city): #takes coords from geopy and makes them readable by darksk
     geolocator = Nominatim(user_agent="Sibyl")
     location = geolocator.geocode(city)
     coords = (str((location.latitude,location.longitude))).split(', ')
-    #coords = coords.split(', ')
-    lat = coords[0]
-    long = coords[1]
-    lat=lat.replace('(','')
-    long=long.replace(')','')
-    lat = lat.split('.')
-    long = long.split('.')
-    longi = long[1]
-    longi = str(long[0])+'.'+str((longi[0:4]))
-    latind = lat[1]
-    lati = str(lat[0])+'.'+str((latind[0:4]))
-    coords = lati+', '+longi
-    return coords
+    lat, long = coords[0], coords[1]
+    lat, long = lat.replace('(',''), long.replace(')','')
+    lat, long = lat.split('.'), long.split('.')
+    longi, latind = long[1], lat[1]
+    longi, lati = str(long[0])+'.'+str((longi[0:4])), str(lat[0])+'.'+str((latind[0:4]))
+    return (lati+', '+longi)
 
 def precipGetter(list,n): #since not all of the json list parts have precip, this is just to stop any errors from happenening when the days objects is made. Same with the one after this
     try:
@@ -61,8 +54,8 @@ def centralizor(widthOfIcon, widthOfText): #centers the text. I think pygame has
     return ((widthOfIcon - (widthOfText)) / 2)
 
 def titalize(word): #capitalize the first letter of the name of the city and only that letter. Kinda weird because for cities like new york it would be New york, but broadcasting doesn't care about new york I guess
-    capped_word = capped_word.lower()
-    capped_word = (word[0]).capitalize() + (word[1:(len(word))])
+    capped_word = word.lower()
+    capped_word = (capped_word[0]).capitalize() + (capped_word[1:(len(word))])
     return capped_word
 
 def makeCurrent(city): #gets weather information and returns a list
@@ -70,6 +63,7 @@ def makeCurrent(city): #gets weather information and returns a list
     while True: #makeCoords used to only work sometimes. It wasn't a fatal error or anything, you just had to do it again so it loops everytime it doesn't work.
         try:
             if city != '':
+                print('flag1    ')
                 coords = makeCoords(city)
             else:
                 coords = '0, 0'
@@ -77,15 +71,19 @@ def makeCurrent(city): #gets weather information and returns a list
         except:
             pass
     url = 'https://api.darksky.net/forecast/'+ key +'/'+ coords
+
     try:
-        json_data = requests.get(url).json()
+        json_data = requests.get(url).json() #THIS is where the magic happens (api call)
+
     except:
         return 3
+
     days = [Day((json_data['hourly']['data'][i*12]['temperature']),
                 (json_data['hourly']['data'][i*12]['icon']),
                 (precipGetter(json_data,i)),
                 (precipChanceGetter(json_data,i)))
                 for i in range(0,4)]
+
     listoDays = []
     for i in range(0,4):
         temp = [days[i].tellTemp(),
@@ -97,77 +95,89 @@ def makeCurrent(city): #gets weather information and returns a list
     return listoDays
 
 def makeImage(listoDays, where, cityName, backgroundLocation): #puts assets on a pygame surface and takes a screenshot.
-    white = (255, 255, 255)
+
+    white = (255, 255, 255) #init values n that
     black = (0,0,0)
     icon_stroke = 8
     w = 1280
     h = 720
+    increY = 64
     bg = pygame.image.load(backgroundLocation)
-    #bg = pygame.draw.rect(screen,(0,255,0),(0,0,1280,720))
     screen = pygame.display.set_mode((w, h))
     logo = pygame.image.load("assets/logo.png")
-    #screen.fill((0,255,0))
-    #screen.fill((white))
-    myfont = pygame.font.SysFont('Arial', 30)
+
+    myfont = pygame.font.SysFont('Arial', 35)       #these are all the font sizes n that
     titalFont = pygame.font.SysFont('Arial', 110)
-    smolFont = pygame.font.SysFont('Arial', 25)
-    why = 64
+    smolFont = pygame.font.SysFont('Arial', 30)
+
+
     titalOfCity = titalize(cityName)
     theCity = titalFont.render(titalOfCity,True,(black))
-    screen.blit(bg,(0,0))
     times = ["Now","Later","Tomorrow","Afternoon"]
+    screen.blit(bg,(0,0)) #background
+
     for i in range(0,4): #this is the part where stuff actually goes on the screen. Does all of this, saves, then closes
         img = pygame.image.load('assets/' + str(listoDays[i][1]) + '.png') #loads the icon for each of the weather things based on what the weather is
-        temperature = myfont.render(str(listoDays[i][0]), True, (black))
+
+        temperature = myfont.render(str(listoDays[i][0]), True, (black)) #text n that
         theTime = myfont.render(str(times[i]), True, (black))
+
         txtMoveby = centralizor(img.get_width(), temperature.get_width()) #gets the value that we need to adjust the x coord to be centered with the weather icon.
         timeMoveby = centralizor(img.get_width(), theTime.get_width())    #same idea
+
         typeOfPrecip = myfont.render(str(listoDays[i][2]), True, (black))
-        if str(listoDays[i][3]) != '0': 
+
+        if str(listoDays[i][3]) != '0': #error prevention
             placeholder = str(listoDays[i][3]) + "%" + " chance of " + str(listoDays[i][2])
             precipChance = smolFont.render(str(placeholder), True, (black))
             precipMoveby = centralizor(img.get_width(),precipChance.get_width())
-            screen.blit(precipChance,(why + precipMoveby,420 + 40))
+            screen.blit(precipChance,(increY + precipMoveby,420 + 40))
+
         pygame.draw.rect(screen, #this is the background box that gives the icons their outline
                         (black),
-                        ((why-(icon_stroke/2)),
+                        ((increY-(icon_stroke/2)),
                         256 - (icon_stroke/2) + 40,
                         img.get_width() + icon_stroke,
                         img.get_height() + icon_stroke))
         pygame.draw.rect(screen, #this is the white box behind the 'time' names. Makes it more legible n that
                         (white),
-                        [(why + timeMoveby-2),
+                        [(increY + timeMoveby-2),
                         195-2 + 40,
                         (theTime.get_width()+4),
                         (theTime.get_height()+4)])
         pygame.draw.rect(screen, #this is the outline for the white boxes. LEGABILITY!!
                         (black),
-                        [(why + timeMoveby-2),
+                        [(increY + timeMoveby-2),
                         195-2 + 40,
                         (theTime.get_width()+4),
                         (theTime.get_height()+4)],
                         2)
-        screen.blit(temperature,(why + txtMoveby,426)) #temp in *C
-        screen.blit(img,(why,296))
-        screen.blit(theCity,(25 ,0))
-        screen.blit(theTime,(why + timeMoveby,195 + 40))
-        screen.blit(logo,(1190,10))
-        why += 320
+
+        screen.blit(temperature,(increY + txtMoveby,426)) #temp in *C
+        screen.blit(img,(increY,296)) #icon
+        screen.blit(theCity,(25 ,0)) #name of city
+        screen.blit(theTime,(increY + timeMoveby,195 + 40)) #time stamps
+        screen.blit(logo,(1190,10)) #laurierlive logo
+        increY += 320
+
     pygame.display.flip()
     saveHere = (str(where))
 
-    if saveHere != '':
+    if saveHere != '': #opening the file dialog then quitting would cause it to save a file called '.png' (not title) so this is just to prevent that from happening
         pygame.image.save(screen, "temp.png")
+
         try:
             pygame.display.quit()
             os.rename("temp.png", str(saveHere)+".png")
             return 1 #I stole this idea from C programming. All functions have a return 1 or 0 built in and I didn't know how to prompt for overwriting with tkinter so when life gives you errors I guess.
             exit()
-        except FileExistsError:
+
+        except FileExistsError: #Don't know how to overwrite. Just stop them from doing that then ask them to save again
             pygame.display.quit()
             os.remove("temp.png")
             return 0
             exit()
+
     else:
         pygame.display.quit()
         return 4
