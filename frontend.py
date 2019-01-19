@@ -6,22 +6,25 @@ from backend import *
 import datetime
 import os
 
-gui = Tk()
+gui = Tk()                  #some tkinter init stuff n that
 gui.geometry("240x288")
 gui.title("Sibyl")
-gui.iconbitmap('assets/icon_qai_icon.ico')
+gui.iconbitmap('assets/icon_qai_icon.ico') #I have that graphic design sauce 8)
+
 def getWeather(param, cityName, backgroundLocation, error_log):
     error_log = error_log
     now = datetime.datetime.now()
     name = now.strftime("%Y-%m-%d")
     where = filedialog.asksaveasfilename(initialdir = '/',title = "Select file",initialfile = (name),filetypes = (("png files","*.png"),("all files","*.*")))
-    print(where)
+
     if param != '':
-        error_catcher = makeImage(param,where,cityName, backgroundLocation)
+        error_catcher = makeForecast(param,where,cityName, backgroundLocation)
     else:
         error_catcher = 5
+
     changeErrorLog(error_catcher,error_log)
-def changeBackground(obj):
+
+def changeBackground(obj): #changes the background n that
     newBgLocation = filedialog.askopenfilename(initialdir = 'assets',title = "Select file",filetypes = (("png files","*.png"),("jpg files","*.jpg"),("all files","*.*")))
     obj.delete(0,END)
     obj.insert(END, newBgLocation)
@@ -37,7 +40,7 @@ def changeErrorLog(error_number, obj): #all the possible errors (that we know of
     }
     obj['text'] = errors.get(int(error_number))
 
-def main():
+def main(): #all the buttons n gui stuff n that
 
     a = Label(gui ,text="City:").grid(row=0,column=0)
     b = Label(gui ,text="Background:").grid(row=3,column=0)
@@ -57,7 +60,7 @@ def main():
     change = Button(gui, text="Change Background", command=lambda : changeBackground(name))
     change.grid(row=5,column=0,pady=(0,10))
 
-    getter = Button(gui, text="Get Weather",command=lambda : getWeather(makeCurrent(param.get()),param.get(),name.get(),e))
+    getter = Button(gui, text="Get Weather",command=lambda : getWeather(getForecast(param.get()),param.get(),name.get(),e))
     getter.grid(row=2,column=0,pady=(0,10))
 
 main()

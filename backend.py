@@ -5,7 +5,7 @@ import datetime
 import os
 
 pygame.init()
-class Day:
+class Day: #this class has all of the weather information for each of the days
     def __init__(self,temp,sum,pt,ptper):
         self.temp = temp
         self.sum = sum
@@ -20,14 +20,11 @@ class Day:
     def tellPtper(self):
         return self.ptper
 
-def FtoC(F):
+def FtoC(F): #my own temperature conversion function 8)
     C = (int(F)-32) * (5/9)
     return str(int(C)) + "°C"
 
-def getFonts():
-    return pygame.font.get_fonts()
-
-def makeCoords(city): #takes coords from geopy and makes them readable by darksky. Not really well typed but it just werks
+def makeCoords(city): #takes coords from geopy and makes them readable by darksky.
     geolocator = Nominatim(user_agent="Sibyl")
     location = geolocator.geocode(city)
     coords = (str((location.latitude,location.longitude))).split(', ')
@@ -58,12 +55,11 @@ def titalize(word): #capitalize the first letter of the name of the city and onl
     capped_word = (capped_word[0]).capitalize() + (capped_word[1:(len(word))])
     return capped_word
 
-def makeCurrent(city): #gets weather information and returns a list
+def getForecast(city): #gets weather information and returns a list
     key = '114a036fbe8618ec0e3c7b7694391c35'
     while True: #makeCoords used to only work sometimes. It wasn't a fatal error or anything, you just had to do it again so it loops everytime it doesn't work.
         try:
             if city != '':
-                print('flag1    ')
                 coords = makeCoords(city)
             else:
                 coords = '0, 0'
@@ -78,6 +74,7 @@ def makeCurrent(city): #gets weather information and returns a list
     except:
         return 3
 
+    #object oriented programming be like
     days = [Day((json_data['hourly']['data'][i*12]['temperature']),
                 (json_data['hourly']['data'][i*12]['icon']),
                 (precipGetter(json_data,i)),
@@ -90,11 +87,37 @@ def makeCurrent(city): #gets weather information and returns a list
                 days[i].tellSum(),
                 days[i].tellPt(),
                 days[i].tellPtper()]
-        listoDays.append(temp)
+        listoDays.append(temp) #makes the list that makeForecast() reads from the object info
     json_data = '' #not sure if this makes it faster but the actual json dump is huge, and all of it is in 1 variable so meh
     return listoDays
 
-def makeImage(listoDays, where, cityName, backgroundLocation): #puts assets on a pygame surface and takes a screenshot.
+
+def getTemp(city):
+    key = '114a036fbe8618ec0e3c7b7694391c35'
+    while True: #makeCoords used to only work sometimes. It wasn't a fatal error or anything, you just had to do it again so it loops everytime it doesn't work.
+        try:
+            if city != '':
+                coords = makeCoords(city)
+            else:
+                coords = '0, 0'
+            break
+        except:
+            pass
+
+    url = 'https://api.darksky.net/forecast/'+ key +'/'+ coords
+
+    try:
+        json_data = requests.get(url).json()
+
+    except:
+        return 3
+    listoTemps = []
+    for i in range(49):
+        listoTemps.append(FtoC(json_data['hourly']['data'][i]['temperature']))
+
+    print(listoTemps)
+
+def makeForecast(listoDays, where, cityName, backgroundLocation): #puts assets on a pygame surface and takes a screenshot.
 
     white = (255, 255, 255) #init values n that
     black = (0,0,0)
@@ -106,9 +129,9 @@ def makeImage(listoDays, where, cityName, backgroundLocation): #puts assets on a
     screen = pygame.display.set_mode((w, h))
     logo = pygame.image.load("assets/logo.png")
 
-    myfont = pygame.font.SysFont('Arial', 35)       #these are all the font sizes n that
+    myfont = pygame.font.SysFont('Arial', 30)       #these are all the font sizes n that
     titalFont = pygame.font.SysFont('Arial', 110)
-    smolFont = pygame.font.SysFont('Arial', 30)
+    smolFont = pygame.font.SysFont('Arial', 25)
 
 
     titalOfCity = titalize(cityName)
@@ -121,11 +144,10 @@ def makeImage(listoDays, where, cityName, backgroundLocation): #puts assets on a
 
         temperature = myfont.render(str(listoDays[i][0]), True, (black)) #text n that
         theTime = myfont.render(str(times[i]), True, (black))
+        typeOfPrecip = myfont.render(str(listoDays[i][2]), True, (black))
 
         txtMoveby = centralizor(img.get_width(), temperature.get_width()) #gets the value that we need to adjust the x coord to be centered with the weather icon.
         timeMoveby = centralizor(img.get_width(), theTime.get_width())    #same idea
-
-        typeOfPrecip = myfont.render(str(listoDays[i][2]), True, (black))
 
         if str(listoDays[i][3]) != '0': #error prevention
             placeholder = str(listoDays[i][3]) + "%" + " chance of " + str(listoDays[i][2])
@@ -160,13 +182,13 @@ def makeImage(listoDays, where, cityName, backgroundLocation): #puts assets on a
         screen.blit(logo,(1190,10)) #laurierlive logo
         increY += 320
 
-    pygame.display.flip()
+    pygame.display.flip() #puts everything on screen :)
     saveHere = (str(where))
 
     if saveHere != '': #opening the file dialog then quitting would cause it to save a file called '.png' (not title) so this is just to prevent that from happening
-        pygame.image.save(screen, "temp.png")
+        pygame.image.save(screen, "temp.png") #screenshots screen and saves it as a temporary file
 
-        try:
+        try: #error prevention be like
             pygame.display.quit()
             os.rename("temp.png", str(saveHere)+".png")
             return 1 #I stole this idea from C programming. All functions have a return 1 or 0 built in and I didn't know how to prompt for overwriting with tkinter so when life gives you errors I guess.
@@ -181,3 +203,7 @@ def makeImage(listoDays, where, cityName, backgroundLocation): #puts assets on a
     else:
         pygame.display.quit()
         return 4
+
+
+
+getTemp('Ottawa')
